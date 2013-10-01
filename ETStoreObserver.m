@@ -1,18 +1,18 @@
 //
-//  ZTStoreObserver.m
+//  ETStoreObserver.m
 //  iOS In-App Purchase
 //
 //  Created by Zhenya Tulusha on 17.11.10.
-//  Copyright 2010 DIMALEX. All rights reserved.
+//  Copyright 2013 Tulusha.com. All rights reserved.
 //
 
-#import "ZTStoreObserver.h"
-#import "ZTStoreManager.h"
+#import "ETStoreObserver.h"
+#import "ETStoreManager.h"
 
 
-@interface ZTStoreManager (InternalMethods)
+@interface ETStoreManager (InternalMethods)
 
-// these three functions are called from ZTStoreObserver
+// these three functions are called from ETStoreObserver
 - (void) transactionCanceled: (SKPaymentTransaction *)transaction;
 - (void) failedTransaction: (SKPaymentTransaction *)transaction;
 
@@ -20,7 +20,7 @@
 	 transactionReceipt: (NSString*) recieptData;
 @end
 
-@implementation ZTStoreObserver
+@implementation ETStoreObserver
 
 - (void)paymentQueue:(SKPaymentQueue *)queue updatedTransactions:(NSArray *)transactions
 {
@@ -56,13 +56,12 @@
     {		
 
         // Optionally, display an error here.	
-		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error!" message:[NSString stringWithFormat:@"%@",[transaction.error localizedDescription]]
+		UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", @"") message:[NSString stringWithFormat:@"%@",[transaction.error localizedDescription]]
 													   delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
 		[alert show];
-		[alert release];	
     }	
     
-    [[ZTStoreManager sharedManager] transactionCanceled:transaction];
+    [[ETStoreManager sharedManager] transactionCanceled:transaction];
     
     [[SKPaymentQueue defaultQueue] finishTransaction: transaction];	
 }
@@ -70,7 +69,7 @@
 - (void) completeTransaction: (SKPaymentTransaction *)transaction
 {		
     NSString *receiptStr = [[NSString alloc] initWithData:transaction.transactionReceipt encoding:NSUTF8StringEncoding];
-    [[ZTStoreManager sharedManager] provideContent: transaction.payment.productIdentifier transactionReceipt:receiptStr];	
+    [[ETStoreManager sharedManager] provideContent: transaction.payment.productIdentifier transactionReceipt:receiptStr];
     
 	//transaction.transactionReceipt - encode with base64 transaction information
     [[SKPaymentQueue defaultQueue] finishTransaction: transaction];	
@@ -79,7 +78,7 @@
 - (void) restoreTransaction: (SKPaymentTransaction *)transaction
 {	
     NSString *receiptStr = [[NSString alloc] initWithData:transaction.transactionReceipt encoding:NSUTF8StringEncoding];
-    [[ZTStoreManager sharedManager] provideContent: transaction.payment.productIdentifier transactionReceipt:receiptStr];	
+    [[ETStoreManager sharedManager] provideContent: transaction.payment.productIdentifier transactionReceipt:receiptStr];
     [[SKPaymentQueue defaultQueue] finishTransaction: transaction];	
 }
 

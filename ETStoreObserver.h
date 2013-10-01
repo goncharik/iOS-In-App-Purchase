@@ -1,16 +1,16 @@
 //
-//  ZTStoreObserver.h
+//  ETStoreObserver.h
 //  iOS In-App Purchase
 //
 //  Created by Zhenya Tulusha on 17.11.10.
-//  Copyright 2010 DIMALEX. All rights reserved.
+//  Copyright 2013 Tulusha.com. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
 
 
-@interface ZTStoreObserver : NSObject <SKPaymentTransactionObserver> {
+@interface ETStoreObserver : NSObject <SKPaymentTransactionObserver> {
 	
 	
 }

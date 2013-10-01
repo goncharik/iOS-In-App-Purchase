@@ -1,35 +1,35 @@
 //
-//  ZTStoreManager.h
+//  ETStoreManager.h
 //  iOS In-App Purchase
 //
-//  Created by Zhenya Tulusha on 17.11.10.
-//  Copyright 2010 DIMALEX. All rights reserved.
+//  Created by Eugene Tulusha on 17.11.10.
+//  Copyright 2013 Tulusha.com. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <StoreKit/StoreKit.h>
-#import "ZTStoreObserver.h"
+#import "ETStoreObserver.h"
 
-@protocol ZTStoreKitDelegate <NSObject>
+@protocol ETStoreKitDelegate <NSObject>
 @optional
 - (void)productPurchased:(NSString *)productId withReceipt:(NSString*)receipt;
 - (void)productNotPurchased:(NSString *)message;
 @end
 
-@interface ZTStoreManager : NSObject <SKProductsRequestDelegate> {
+@interface ETStoreManager : NSObject <SKProductsRequestDelegate> {
 	
 	BOOL isPurchasing;
 	NSMutableArray *_purchasableObjects;
-	ZTStoreObserver *storeObserver;	
+	ETStoreObserver *storeObserver;
     
     NSString* prodId; 
 	
 }
 
 @property (nonatomic, retain) NSMutableArray *purchasableObjects;
-@property (nonatomic, retain) ZTStoreObserver *storeObserver;
+@property (nonatomic, retain) ETStoreObserver *storeObserver;
 
-+ (ZTStoreManager*)sharedManager;
++ (ETStoreManager *)sharedManager;
 
 //DELEGATES
 +(id)delegate;	

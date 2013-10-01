@@ -1,35 +1,29 @@
 //
-//  ZTStoreManager.m
+//  ETStoreManager.m
 //  iOS In-App Purchase
 //
-//  Created by Zhenya Tulusha on 17.11.10.
-//  Copyright 2010 DIMALEX. All rights reserved.
+//  Created by Eugene Tulusha on 17.11.10.
+//  Copyright 2013 Tulusha.com. All rights reserved.
 //
 
-#import "ZTStoreManager.h"
+#import "ETStoreManager.h"
 
-@implementation ZTStoreManager
+@implementation ETStoreManager
 
 @synthesize purchasableObjects = _purchasableObjects;
 @synthesize storeObserver = _storeObserver;
-
-static NSString *productId = @"<your_product_id";
 									 
-static __weak id<ZTStoreKitDelegate> _delegate;
+static __weak id<ETStoreKitDelegate> _delegate;
 
-static ZTStoreManager* _sharedStoreManager = nil; 
-
-+ (ZTStoreManager *)sharedManager
++ (ETStoreManager *)sharedManager
 {
-    @synchronized(self)
+    static ETStoreManager *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^
     {
-        if (_sharedStoreManager == nil)
-        {
-            _sharedStoreManager = [[self alloc] init];
-        }
-    }
-    
-    return(_sharedStoreManager);
+        sharedInstance = [ETStoreManager new];
+    });
+    return sharedInstance;
 }
 
 - (id)init
@@ -40,20 +34,17 @@ static ZTStoreManager* _sharedStoreManager = nil;
     {
         self.purchasableObjects = [[NSMutableArray alloc] init];
         
-        self.storeObserver = [[ZTStoreObserver alloc] init];
+        self.storeObserver = [[ETStoreObserver alloc] init];
         [[SKPaymentQueue defaultQueue] addTransactionObserver:self.storeObserver];
     }
     
     return self;
 }
 
-- (void)dealloc {
-	
-	[_purchasableObjects release];
-	[_storeObserver release];
-	
-	[_sharedStoreManager release];
-	[super dealloc];
+- (void)dealloc
+{
+	_purchasableObjects = nil;
+	_storeObserver = nil;
 }
 
 + (id)delegate {
@@ -67,7 +58,7 @@ static ZTStoreManager* _sharedStoreManager = nil;
 }
 
 #pragma mark -
-#pragma mark main Purchsing functional
+#pragma mark main Purchasing functional
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response
 {
@@ -76,19 +67,19 @@ static ZTStoreManager* _sharedStoreManager = nil;
 	// populate UI
 	if ([response.invalidProductIdentifiers count] == 0)
 	{
-        SKProduct* purchasebleProduct = nil;
+        SKProduct*purchasableProduct = nil;
 		for (SKProduct *product in self.purchasableObjects)
         {
             if ([prodId isEqualToString:[product productIdentifier]])
             {
-                purchasebleProduct = product;
+                purchasableProduct = product;
             }
             NSLog(@"Feature: %@, Cost: %f, ID: %@",[product localizedTitle],
                   [[product price] doubleValue], [product productIdentifier]);
         }
-        if (purchasebleProduct != nil)
+        if (purchasableProduct != nil)
         {
-            SKPayment *payment = [SKPayment paymentWithProduct:purchasebleProduct];
+            SKPayment *payment = [SKPayment paymentWithProduct:purchasableProduct];
             [[SKPaymentQueue defaultQueue] addPayment:payment];
         }
 		else
@@ -108,8 +99,6 @@ static ZTStoreManager* _sharedStoreManager = nil;
             [_delegate productNotPurchased:@"Sorry \nThis product isn't available in AppStore yet."];
         }
     }
-	
-	[request autorelease];
 }
 
 - (void) buyFeature:(NSString*) featureId
@@ -140,11 +129,10 @@ static ZTStoreManager* _sharedStoreManager = nil;
 - (void) failedTransaction: (SKPaymentTransaction *)transaction
 {
     isPurchasing = NO;
-	NSString *messageToBeShown = [NSString stringWithFormat:@"Reason: %@, You can try: %@", [transaction.error localizedFailureReason], [transaction.error localizedRecoverySuggestion]];
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Unable to complete your purchase" message:messageToBeShown
+	NSString *messageToBeShown = [NSString stringWithFormat:NSLocalizedString(@"Reason: %@, You can try: %@", @""), [transaction.error localizedFailureReason], [transaction.error localizedRecoverySuggestion]];
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Unable to complete your purchase", @"") message:messageToBeShown
 												   delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
 	[alert show];
-	[alert release];
     if ([_delegate respondsToSelector:@selector(productNotPurchased:)])
     {
         [_delegate productNotPurchased:nil];
